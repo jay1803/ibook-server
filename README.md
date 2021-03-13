@@ -65,6 +65,7 @@ Will return annotations of specific chapter
     "createdDate": "611492468.634970",
     "presentText": "A rifle protruded from the young man’s backpack, but he looked friendly enough; a hitchhiker with a Remington semiautomatic isn’t the sort of thing that gives motorists pause in the forty-ninth state.",
     "selectedText": "rifle",
+    "style": 3,
     "comment": "My comments"
   },
   {...}
