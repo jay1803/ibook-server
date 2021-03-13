@@ -1,0 +1,7 @@
+extends layout
+
+block content
+  h1= title
+  each book in books
+    li
+      a(href='books/'+book.id+"/notes")=book.title
