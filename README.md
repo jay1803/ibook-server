@@ -4,6 +4,8 @@ If you like me, love reading books with Apple Books (former iBooks), you may als
 
 # Endpoints
 
+Update the `./controllers/bookController.js`, update the `DB_NOTE` and `DB_BOOK`, replace the `~` with your absolute User folder path.
+
 ## Get all books
 
 This will return all your books in Apple Book.
