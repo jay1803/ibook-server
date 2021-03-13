@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
-const DB_BOOK = '~/Library/Containers/com.apple.iBooksX/Data/Documents/BKLibrary/BKLibrary-1-091020131601.sqlite';
-const DB_NOTE = '~/Library/Containers/com.apple.iBooksX/Data/Documents/AEAnnotation/AEAnnotation_v10312011_1727_local.sqlite';
+const DB_BOOK = '/Users/max/Library/Containers/com.apple.iBooksX/Data/Documents/BKLibrary/BKLibrary-1-091020131601.sqlite';
+const DB_NOTE = '/Users/max/Library/Containers/com.apple.iBooksX/Data/Documents/AEAnnotation/AEAnnotation_v10312011_1727_local.sqlite';
 
 
 exports.getBooks = async (req, res) => {
@@ -60,7 +60,7 @@ exports.getChaptersByBookId = async (req, res) => {
 exports.getNotesByChapterId = async (req, res) => {
   const bookId = req.params.bookId;
   const chapterId = req.params.chapterId;
-  const sql = `SELECT ZANNOTATIONUUID as id, ZFUTUREPROOFING6 as createdDate, ZANNOTATIONREPRESENTATIVETEXT as presentText, ZANNOTATIONSELECTEDTEXT as selectedText, ZANNOTATIONNOTE as comment FROM "ZAEANNOTATION" WHERE "ZANNOTATIONASSETID" == "${bookId}" AND "ZPLLOCATIONRANGESTART" == "${chapterId}" ORDER BY "ZFUTUREPROOFING6" COLLATE NOCASE ASC;`;
+  const sql = `SELECT ZANNOTATIONUUID as id, ZFUTUREPROOFING6 as createdDate, ZANNOTATIONREPRESENTATIVETEXT as presentText, ZANNOTATIONSELECTEDTEXT as selectedText, ZANNOTATIONSTYLE as style, ZANNOTATIONNOTE as comment FROM "ZAEANNOTATION" WHERE "ZANNOTATIONASSETID" == "${bookId}" AND "ZPLLOCATIONRANGESTART" == "${chapterId}" ORDER BY "ZFUTUREPROOFING6" COLLATE NOCASE ASC;`;
   const db = new sqlite3.Database(DB_NOTE, (err) => {
     if (err) {
       console.error(err);
