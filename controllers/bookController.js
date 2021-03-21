@@ -4,7 +4,7 @@ const DB_NOTE = '/Users/max/Library/Containers/com.apple.iBooksX/Data/Documents/
 
 
 exports.getBooks = async (req, res) => {
-  const sql = 'SELECT ZASSETID as id, ZTITLE as title, ZAUTHOR as author, ZCOVERURL as coverURL, ZBOOKHIGHWATERMARKPROGRESS as progress, ZLASTOPENDATE as lastOpenDate, ZMODIFICATIONDATE as modificationDate, ZDATEFINISHED as finishedDate FROM "ZBKLIBRARYASSET" ORDER BY "ZCREATIONDATE" COLLATE NOCASE DESC';
+  const sql = 'SELECT ZASSETID as id, ZTITLE as title, ZAUTHOR as author, ZCOVERURL as coverURL, ZBOOKHIGHWATERMARKPROGRESS as progress, ZPATH as path, ZLASTOPENDATE as lastOpenDate, ZMODIFICATIONDATE as modificationDate, ZDATEFINISHED as finishedDate FROM "ZBKLIBRARYASSET" WHERE "ZPATH" !="" ORDER BY "ZCREATIONDATE" COLLATE NOCASE DESC';
   const db = new sqlite3.Database(DB_BOOK, (err) => {
     if (err) {
       console.error(err);
@@ -22,7 +22,7 @@ exports.getBooks = async (req, res) => {
 
 exports.getBookById = async (req, res) => {
   const bookId = req.params.bookId;
-  const sql = `SELECT ZASSETID as id, ZTITLE as title, ZAUTHOR as author, ZCOVERURL as coverURL, ZBOOKHIGHWATERMARKPROGRESS as progress, ZLASTOPENDATE as lastOpenDate, ZMODIFICATIONDATE as modificationDate, ZDATEFINISHED as finishedDate  FROM "ZBKLIBRARYASSET" WHERE ZASSETID == "${bookId}" ORDER BY "ZCREATIONDATE" LIMIT 1`;
+  const sql = `SELECT ZASSETID as id, ZTITLE as title, ZAUTHOR as author, ZCOVERURL as coverURL, ZBOOKHIGHWATERMARKPROGRESS as progress, ZPATH as path, ZLASTOPENDATE as lastOpenDate, ZMODIFICATIONDATE as modificationDate, ZDATEFINISHED as finishedDate  FROM "ZBKLIBRARYASSET" WHERE ZASSETID == "${bookId}" ORDER BY "ZCREATIONDATE" LIMIT 1`;
   const db = new sqlite3.Database(DB_BOOK, (err) => {
     if (err) {
       console.error(err);
