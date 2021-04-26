@@ -73,14 +73,19 @@ exports.getNotesByChapterId = async (req, res) => {
       return console.error(err.message);
     }
     annotations.forEach(annotation => {
-      let location = annotation.location.split('/');
-      for (let i = 0; i < 7; i++) {
+      let location = [];
+      try {
+        location = annotation.location.split('!')[1].split(',')[0].split('/');
+      } catch (error) {
+        console.log(annotation);
+      }
+      // console.log(location);
+      for (let i = 0; i < 5; i++) {
         if (_.isUndefined(location[i])) {
           location[i] = 0;
         }
       }
-      annotation.sorting = parseInt(location[3]) * 1000000000000 + parseInt(location[4]) * 1000000 + parseInt(location[5]) * 1000 + parseInt(location[6]);
-      console.log(annotation.newLocation);
+      annotation.sorting = parseInt(location[1]) * 1000000000000 + parseInt(location[2]) * 1000000 + parseInt(location[3]) * 1000 + parseInt(location[4]);
     });
     annotations.sort((a, b) => {
       return a.sorting - b.sorting;
