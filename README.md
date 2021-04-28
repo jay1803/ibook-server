@@ -15,9 +15,15 @@ This will return all your books in Apple Book.
 ```
 [
   {
-    "id":"419944847",
-    "title":"Into the Wild",
-    "author":"Jon Krakauer"
+    "id": "881256329",
+    "title": "The Swift Programming Language (Swift 5.2)",
+    "author": "Apple Inc.",
+    "coverURL": "https://is1-ssl.mzstatic.com/image/thumb/Publication113/v4/2c/25/05/2c25051d-2699-8c1c-04e1-988b02990141/cover.jpg/1400x2100w.jpg",
+    "progress": 0,
+    "path": "/Users/username/Library/Containers/com.apple.BKAgentService/Data/Documents/iBooks/Books/881256329.epub",
+    "lastOpenDate": 558633681,
+    "modificationDate": 558633738.01113,
+    "finishedDate": null
   },
   {...}]
 ```
@@ -30,10 +36,16 @@ This will return a single book info.
 
 ```
 {
-  "id":"419944847",
-  "title":"Into the Wild",
-  "author":"Jon Krakauer"
-}
+    "id": "881256329",
+    "title": "The Swift Programming Language (Swift 5.2)",
+    "author": "Apple Inc.",
+    "coverURL": "https://is1-ssl.mzstatic.com/image/thumb/Publication113/v4/2c/25/05/2c25051d-2699-8c1c-04e1-988b02990141/cover.jpg/1400x2100w.jpg",
+    "progress": 0,
+    "path": "/Users/username/Library/Containers/com.apple.BKAgentService/Data/Documents/iBooks/Books/881256329.epub",
+    "lastOpenDate": 558633681,
+    "modificationDate": 558633738.01113,
+    "finishedDate": null
+  }
 ```
 
 ## Get annotations chapters by book id
