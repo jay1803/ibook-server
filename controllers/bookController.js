@@ -10,7 +10,7 @@ exports.getBooks = async (req, res) => {
     if (err) {
       console.error(err);
     }
-    console.log('Open the database connection.');
+    // console.log('Open the database connection.');
   });
   db.all(sql, [], (err, rows) => {
     if (err) {
@@ -28,7 +28,7 @@ exports.getBookById = async (req, res) => {
     if (err) {
       console.error(err);
     }
-    console.log('Open the database connection.');
+    // console.log('Open the database connection.');
   });
   db.each(sql, [], (err, rows) => {
     if (err) {
@@ -46,13 +46,13 @@ exports.getChaptersByBookId = async (req, res) => {
     if (err) {
       console.error(err);
     }
-    console.log('Open the database connection.');
+    // console.log('Open the database connection.');
   });
   db.all(sql, [], (err, rows) => {
     if (err) {
       return console.error(err.message);
     }
-    console.log('chapters: ', rows);
+    // console.log('chapters: ', rows);
     res.send(rows);
   });
   db.close();
@@ -66,7 +66,7 @@ exports.getNotesByChapterId = async (req, res) => {
     if (err) {
       console.error(err);
     }
-    console.log('Open the database connection.');
+    // console.log('Open the database connection.');
   });
   db.all(sql, [], (err, annotations) => {
     if (err) {
@@ -74,18 +74,51 @@ exports.getNotesByChapterId = async (req, res) => {
     }
     annotations.forEach(annotation => {
       let location = [];
+      let chapter;
+      let annotationsStart;
+      let annotationsEnd;
       try {
-        location = annotation.location.split('!')[1].split(',')[0].split('/');
+        location = annotation.location.slice(8, -2);
       } catch (error) {
         console.log(annotation);
       }
-      // console.log(location);
-      for (let i = 0; i < 5; i++) {
-        if (_.isUndefined(location[i])) {
-          location[i] = 0;
+      location = location.split('!')[1];
+      chapter = location.split(',')[0].split('/');
+      for (let i = 0; i < 4; i++) {
+        if (_.isUndefined(chapter[i])) {
+          chapter[i] = '0';
+        }
+        if (chapter[i].indexOf('[') != -1) {
+          chapter[i] = chapter[i].split('[')[0];
+        }
+        if (typeof chapter[i] === 'string') {
+          chapter[i] = parseInt(chapter[i]);
         }
       }
-      annotation.sorting = parseInt(location[1]) * 1000000000000 + parseInt(location[2]) * 1000000 + parseInt(location[3]) * 1000 + parseInt(location[4]);
+      chapter = chapter.slice(1,);
+      chapter = chapter[0] * 1000000000 + chapter[1] * 100000 + chapter[2] * 100;
+      // console.log('chapter: ', chapter);
+
+      annotationsStart = location.split(',')[1].split('/').slice(1,);
+      for (let i = 0; i < 3; i++) {
+        if (_.isUndefined(annotationsStart[i])) {
+          annotationsStart[i] = '0';
+        }
+      }
+      if (annotationsStart[1].indexOf(':') != -1) {
+        annotationsStart[2] = annotationsStart[1].split(':')[1];
+        annotationsStart[1] = annotationsStart[1].split(':')[0];
+      }
+      for (let i = 0; i < 3; i++) {
+        if (typeof annotationsStart[i] === 'string') {
+          annotationsStart[i] = parseInt(annotationsStart[i]);
+        }
+      }
+      annotationsStart = annotationsStart[0] * 1000000000 + annotationsStart[1] * 1000000 + annotationsStart[2] * 1000;
+      console.log('annotationsStart: ', annotationsStart);
+      annotationsEnd = location.split(',')[2].split('/');
+      // console.log(location);
+      annotation.sorting = chapter * 1000000 + annotationsStart * 1000;
     });
     annotations.sort((a, b) => {
       return a.sorting - b.sorting;
