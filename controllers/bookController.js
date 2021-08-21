@@ -5,7 +5,10 @@ const DB_NOTE = '/Users/max/Library/Containers/com.apple.iBooksX/Data/Documents/
 
 
 exports.getBooks = async (req, res) => {
-  const sql = 'SELECT ZASSETID as id, ZTITLE as title, ZAUTHOR as author, ZCOVERURL as coverURL, ZBOOKHIGHWATERMARKPROGRESS as progress, ZPATH as path, ZLASTOPENDATE as lastOpenDate, ZMODIFICATIONDATE as modificationDate, ZDATEFINISHED as finishedDate FROM "ZBKLIBRARYASSET" WHERE "ZPATH" !="" ORDER BY "ZCREATIONDATE" COLLATE NOCASE DESC';
+  let sql = 'SELECT ZASSETID as id, ZTITLE as title, ZAUTHOR as author, ZCOVERURL as coverURL, ZBOOKHIGHWATERMARKPROGRESS as progress, ZPATH as path, ZMODIFICATIONDATE as modificationDate, ZDATEFINISHED as finishedDate, ZLASTENGAGEDDATE as lastEngagedDate, ZLASTOPENDATE as lastOpenDate, ZCREATIONDATE as creationDate FROM "ZBKLIBRARYASSET" WHERE "ZPATH" !="" ORDER BY creationDate DESC';
+  if (req.query.orderBy === 'lastOpenDate') {
+    sql = 'SELECT ZASSETID as id, ZTITLE as title, ZAUTHOR as author, ZCOVERURL as coverURL, ZBOOKHIGHWATERMARKPROGRESS as progress, ZPATH as path, ZMODIFICATIONDATE as modificationDate, ZDATEFINISHED as finishedDate, ZLASTENGAGEDDATE as lastEngagedDate, ZLASTOPENDATE as lastOpenDate, ZCREATIONDATE as creationDate FROM "ZBKLIBRARYASSET" WHERE "ZPATH" !="" ORDER BY lastOpenDate DESC'; 
+  }
   const db = new sqlite3.Database(DB_BOOK, (err) => {
     if (err) {
       console.error(err);
@@ -76,7 +79,7 @@ exports.getNotesByChapterId = async (req, res) => {
       let location = [];
       let chapter;
       let annotationsStart;
-      let annotationsEnd;
+
       try {
         location = annotation.location.slice(8, -2);
       } catch (error) {
@@ -97,7 +100,7 @@ exports.getNotesByChapterId = async (req, res) => {
       }
       chapter = chapter.slice(1,);
       chapter = chapter[0] * 1000000000 + chapter[1] * 100000 + chapter[2] * 100;
-      // console.log('chapter: ', chapter);
+
 
       annotationsStart = location.split(',')[1].split('/').slice(1,);
       for (let i = 0; i < 3; i++) {
@@ -116,8 +119,6 @@ exports.getNotesByChapterId = async (req, res) => {
       }
       annotationsStart = annotationsStart[0] * 1000000000 + annotationsStart[1] * 1000000 + annotationsStart[2] * 1000;
       console.log('annotationsStart: ', annotationsStart);
-      annotationsEnd = location.split(',')[2].split('/');
-      // console.log(location);
       annotation.sorting = chapter * 1000000 + annotationsStart * 1000;
     });
     annotations.sort((a, b) => {
