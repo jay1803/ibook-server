@@ -79,12 +79,10 @@ exports.getNotesByChapterId = async (req, res) => {
       let location = [];
       let chapter;
       let annotationsStart;
-
-      try {
-        location = annotation.location.slice(8, -2);
-      } catch (error) {
-        console.log(annotation);
+      if (_.isNull(annotation.location)) {
+        return;
       }
+      location = annotation.location.slice(8, -2);
       location = location.split('!')[1];
       chapter = location.split(',')[0].split('/');
       for (let i = 0; i < 4; i++) {
@@ -118,7 +116,6 @@ exports.getNotesByChapterId = async (req, res) => {
         }
       }
       annotationsStart = annotationsStart[0] * 1000000000 + annotationsStart[1] * 1000000 + annotationsStart[2] * 1000;
-      console.log('annotationsStart: ', annotationsStart);
       annotation.sorting = chapter * 1000000 + annotationsStart * 1000;
     });
     annotations.sort((a, b) => {
