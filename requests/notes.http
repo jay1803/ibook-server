@@ -1,2 +1,2 @@
-GET http://localhost:4000/v1/books/EFE6C1B476B4065750096C397D03D8A0/chapters/17/annotations HTTP/1.1
+GET http://localhost:4000/v1/books/EFE6C1B476B4065750096C397D03D8A0/chapters/36/annotations HTTP/1.1
 content-type: application/json

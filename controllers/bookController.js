@@ -7,7 +7,7 @@ const DB_NOTE = '/Users/max/Library/Containers/com.apple.iBooksX/Data/Documents/
 exports.getBooks = async (req, res) => {
   let sql = 'SELECT ZASSETID as id, ZTITLE as title, ZAUTHOR as author, ZCOVERURL as coverURL, ZBOOKHIGHWATERMARKPROGRESS as progress, ZPATH as path, ZMODIFICATIONDATE as modificationDate, ZDATEFINISHED as finishedDate, ZLASTENGAGEDDATE as lastEngagedDate, ZLASTOPENDATE as lastOpenDate, ZCREATIONDATE as creationDate FROM "ZBKLIBRARYASSET" WHERE "ZPATH" !="" ORDER BY creationDate DESC';
   if (req.query.orderBy === 'lastOpenDate') {
-    sql = 'SELECT ZASSETID as id, ZTITLE as title, ZAUTHOR as author, ZCOVERURL as coverURL, ZBOOKHIGHWATERMARKPROGRESS as progress, ZPATH as path, ZMODIFICATIONDATE as modificationDate, ZDATEFINISHED as finishedDate, ZLASTENGAGEDDATE as lastEngagedDate, ZLASTOPENDATE as lastOpenDate, ZCREATIONDATE as creationDate FROM "ZBKLIBRARYASSET" WHERE "ZPATH" !="" ORDER BY lastOpenDate DESC'; 
+    sql = 'SELECT ZASSETID as id, ZTITLE as title, ZAUTHOR as author, ZCOVERURL as coverURL, ZBOOKHIGHWATERMARKPROGRESS as progress, ZPATH as path, ZMODIFICATIONDATE as modificationDate, ZDATEFINISHED as finishedDate, ZLASTENGAGEDDATE as lastEngagedDate, ZLASTOPENDATE as lastOpenDate, ZCREATIONDATE as creationDate FROM "ZBKLIBRARYASSET" WHERE "ZPATH" !="" ORDER BY lastOpenDate DESC';
   }
   const db = new sqlite3.Database(DB_BOOK, (err) => {
     if (err) {
@@ -55,10 +55,63 @@ exports.getChaptersByBookId = async (req, res) => {
     if (err) {
       return console.error(err.message);
     }
-    // console.log('chapters: ', rows);
     res.send(rows);
   });
   db.close();
+};
+
+const sorting = (annotationLocation) => {
+  let location;
+  let chapters;
+  let annotationsStart;
+  let sortingScore = 0;
+  if (_.isNull(annotationLocation)) {
+    return;
+  }
+  location = annotationLocation.slice(8, -1);
+  location = location.split('!')[1];
+
+  chapters = location.split(',')[0].split('/').slice(1);
+
+  for (let i = 0; i < chapters.length; i++) {
+    if (_.isUndefined(chapters[i])) {
+      chapters[i] = '0';
+    }
+    if (chapters[i].indexOf('[') != -1) {
+      chapters[i] = chapters[i].split('[')[0];
+    }
+    if (typeof chapters[i] === 'string') {
+      chapters[i] = parseInt(chapters[i]);
+    }
+  }
+
+  annotationsStart = location.split(',')[1].split('/').slice(1,);
+  for (let i = 0; i < 3; i++) {
+    if (_.isUndefined(annotationsStart[i])) {
+      annotationsStart[i] = '0';
+    }
+  }
+  if (annotationsStart[1].indexOf(':') != -1) {
+    annotationsStart[2] = annotationsStart[1].split(':')[1];
+    annotationsStart[1] = annotationsStart[1].split(':')[0];
+  }
+  for (let i = 0; i < 3; i++) {
+    if (typeof annotationsStart[i] === 'string') {
+      annotationsStart[i] = parseInt(annotationsStart[i]);
+    }
+  }
+  
+  /**
+  "epubcfi(/6/74[id51]!/4[TI1E0-753b6158870b4cb287491020505fe03c],/74/1:0,/76/42/1:15)"
+  "epubcfi(/6/74[id51]!/4[TI1E0-753b6158870b4cb287491020505fe03c]/68/1,:0,:43)"
+  2 different types of location, the "/74/1" part actually equals to "/68/1" in 2nd sample
+  that's why need to concat 2 locations.
+  */
+  let sort = chapters.concat(annotationsStart);
+  for (let i = 0; i < sort.length; i++) {
+    sortingScore = sort[i] * Math.pow(10, (20-i*4)) + sortingScore;
+  }
+  return sortingScore;
 };
 
 exports.getNotesByChapterId = async (req, res) => {
@@ -76,47 +129,7 @@ exports.getNotesByChapterId = async (req, res) => {
       return console.error(err.message);
     }
     annotations.forEach(annotation => {
-      let location = [];
-      let chapter;
-      let annotationsStart;
-      if (_.isNull(annotation.location)) {
-        return;
-      }
-      location = annotation.location.slice(8, -2);
-      location = location.split('!')[1];
-      chapter = location.split(',')[0].split('/');
-      for (let i = 0; i < 4; i++) {
-        if (_.isUndefined(chapter[i])) {
-          chapter[i] = '0';
-        }
-        if (chapter[i].indexOf('[') != -1) {
-          chapter[i] = chapter[i].split('[')[0];
-        }
-        if (typeof chapter[i] === 'string') {
-          chapter[i] = parseInt(chapter[i]);
-        }
-      }
-      chapter = chapter.slice(1,);
-      chapter = chapter[0] * 1000000000 + chapter[1] * 100000 + chapter[2] * 100;
-
-
-      annotationsStart = location.split(',')[1].split('/').slice(1,);
-      for (let i = 0; i < 3; i++) {
-        if (_.isUndefined(annotationsStart[i])) {
-          annotationsStart[i] = '0';
-        }
-      }
-      if (annotationsStart[1].indexOf(':') != -1) {
-        annotationsStart[2] = annotationsStart[1].split(':')[1];
-        annotationsStart[1] = annotationsStart[1].split(':')[0];
-      }
-      for (let i = 0; i < 3; i++) {
-        if (typeof annotationsStart[i] === 'string') {
-          annotationsStart[i] = parseInt(annotationsStart[i]);
-        }
-      }
-      annotationsStart = annotationsStart[0] * 1000000000 + annotationsStart[1] * 1000000 + annotationsStart[2] * 1000;
-      annotation.sorting = chapter * 1000000 + annotationsStart * 1000;
+      annotation.sorting = sorting(annotation.location);
     });
     annotations.sort((a, b) => {
       return a.sorting - b.sorting;
