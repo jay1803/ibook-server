@@ -70,7 +70,6 @@ const sorting = (annotationLocation) => {
   }
   location = annotationLocation.slice(8, -1);
   location = location.split('!')[1];
-
   chapters = location.split(',')[0].split('/').slice(1);
 
   for (let i = 0; i < chapters.length; i++) {
@@ -85,7 +84,12 @@ const sorting = (annotationLocation) => {
     }
   }
 
-  annotationsStart = location.split(',')[1].split('/').slice(1,);
+  if (location.indexOf(',') != -1) {
+    annotationsStart = location.split(',')[1].split('/').slice(1,);
+  } else {
+    annotationsStart = ['0'];
+  }
+  
   for (let i = 0; i < 3; i++) {
     if (_.isUndefined(annotationsStart[i])) {
       annotationsStart[i] = '0';
