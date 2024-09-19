@@ -1,19 +1,21 @@
-const sqlite3 = require('sqlite3').verbose();
-const _ = require('lodash');
-const DB_BOOK = '/Users/max/Library/Containers/com.apple.iBooksX/Data/Documents/BKLibrary/BKLibrary-1-091020131601.sqlite';
-const DB_NOTE = '/Users/max/Library/Containers/com.apple.iBooksX/Data/Documents/AEAnnotation/AEAnnotation_v10312011_1727_local.sqlite';
-
+const sqlite3 = require("sqlite3").verbose();
+const _ = require("lodash");
+const DB_BOOK =
+  "/Users/max/Library/Containers/com.apple.iBooksX/Data/Documents/BKLibrary/BKLibrary-1-091020131601.sqlite";
+const DB_NOTE =
+  "/Users/max/Library/Containers/com.apple.iBooksX/Data/Documents/AEAnnotation/AEAnnotation_v10312011_1727_local.sqlite";
 
 exports.getBooks = async (req, res) => {
-  let sql = 'SELECT ZASSETID as id, ZTITLE as title, ZAUTHOR as author, ZCOVERURL as coverURL, ZBOOKHIGHWATERMARKPROGRESS as progress, ZPATH as path, ZMODIFICATIONDATE as modificationDate, ZDATEFINISHED as finishedDate, ZLASTENGAGEDDATE as lastEngagedDate, ZLASTOPENDATE as lastOpenDate, ZCREATIONDATE as creationDate FROM "ZBKLIBRARYASSET" WHERE "ZPATH" !="" ORDER BY creationDate DESC';
-  if (req.query.orderBy === 'lastOpenDate') {
-    sql = 'SELECT ZASSETID as id, ZTITLE as title, ZAUTHOR as author, ZCOVERURL as coverURL, ZBOOKHIGHWATERMARKPROGRESS as progress, ZPATH as path, ZMODIFICATIONDATE as modificationDate, ZDATEFINISHED as finishedDate, ZLASTENGAGEDDATE as lastEngagedDate, ZLASTOPENDATE as lastOpenDate, ZCREATIONDATE as creationDate FROM "ZBKLIBRARYASSET" WHERE "ZPATH" !="" ORDER BY lastOpenDate DESC';
+  let sql =
+    'SELECT ZASSETID as id, ZTITLE as title, ZAUTHOR as author, ZCOVERURL as coverURL, ZBOOKHIGHWATERMARKPROGRESS as progress, ZPATH as path, ZMODIFICATIONDATE as modificationDate, ZDATEFINISHED as finishedDate, ZLASTENGAGEDDATE as lastEngagedDate, ZLASTOPENDATE as lastOpenDate, ZCREATIONDATE as creationDate FROM "ZBKLIBRARYASSET" WHERE "ZPATH" !="" ORDER BY creationDate DESC';
+  if (req.query.orderBy === "lastOpenDate") {
+    sql =
+      'SELECT ZASSETID as id, ZTITLE as title, ZAUTHOR as author, ZCOVERURL as coverURL, ZBOOKHIGHWATERMARKPROGRESS as progress, ZPATH as path, ZMODIFICATIONDATE as modificationDate, ZDATEFINISHED as finishedDate, ZLASTENGAGEDDATE as lastEngagedDate, ZLASTOPENDATE as lastOpenDate, ZCREATIONDATE as creationDate FROM "ZBKLIBRARYASSET" WHERE "ZPATH" !="" ORDER BY lastOpenDate DESC';
   }
   const db = new sqlite3.Database(DB_BOOK, (err) => {
     if (err) {
       console.error(err);
     }
-    // console.log('Open the database connection.');
   });
   db.all(sql, [], (err, rows) => {
     if (err) {
@@ -31,7 +33,6 @@ exports.getBookById = async (req, res) => {
     if (err) {
       console.error(err);
     }
-    // console.log('Open the database connection.');
   });
   db.each(sql, [], (err, rows) => {
     if (err) {
@@ -49,7 +50,6 @@ exports.getChaptersByBookId = async (req, res) => {
     if (err) {
       console.error(err);
     }
-    // console.log('Open the database connection.');
   });
   db.all(sql, [], (err, rows) => {
     if (err) {
@@ -69,42 +69,42 @@ const sorting = (annotationLocation) => {
     return;
   }
   location = annotationLocation.slice(8, -1);
-  location = location.split('!')[1];
-  chapters = location.split(',')[0].split('/').slice(1);
+  location = location.split("!")[1];
+  chapters = location.split(",")[0].split("/").slice(1);
 
   for (let i = 0; i < chapters.length; i++) {
     if (_.isUndefined(chapters[i])) {
-      chapters[i] = '0';
+      chapters[i] = "0";
     }
-    if (chapters[i].indexOf('[') != -1) {
-      chapters[i] = chapters[i].split('[')[0];
+    if (chapters[i].indexOf("[") != -1) {
+      chapters[i] = chapters[i].split("[")[0];
     }
-    if (typeof chapters[i] === 'string') {
+    if (typeof chapters[i] === "string") {
       chapters[i] = parseInt(chapters[i]);
     }
   }
 
-  if (location.indexOf(',') != -1) {
-    annotationsStart = location.split(',')[1].split('/').slice(1,);
+  if (location.indexOf(",") != -1) {
+    annotationsStart = location.split(",")[1].split("/").slice(1);
   } else {
-    annotationsStart = ['0'];
+    annotationsStart = ["0"];
   }
-  
+
   for (let i = 0; i < 3; i++) {
     if (_.isUndefined(annotationsStart[i])) {
-      annotationsStart[i] = '0';
+      annotationsStart[i] = "0";
     }
   }
-  if (annotationsStart[1].indexOf(':') != -1) {
-    annotationsStart[2] = annotationsStart[1].split(':')[1];
-    annotationsStart[1] = annotationsStart[1].split(':')[0];
+  if (annotationsStart[1].indexOf(":") != -1) {
+    annotationsStart[2] = annotationsStart[1].split(":")[1];
+    annotationsStart[1] = annotationsStart[1].split(":")[0];
   }
   for (let i = 0; i < 3; i++) {
-    if (typeof annotationsStart[i] === 'string') {
+    if (typeof annotationsStart[i] === "string") {
       annotationsStart[i] = parseInt(annotationsStart[i]);
     }
   }
-  
+
   /**
   "epubcfi(/6/74[id51]!/4[TI1E0-753b6158870b4cb287491020505fe03c],/74/1:0,/76/42/1:15)"
   "epubcfi(/6/74[id51]!/4[TI1E0-753b6158870b4cb287491020505fe03c]/68/1,:0,:43)"
@@ -113,7 +113,7 @@ const sorting = (annotationLocation) => {
   */
   let sort = chapters.concat(annotationsStart);
   for (let i = 0; i < sort.length; i++) {
-    sortingScore = sort[i] * Math.pow(10, (20-i*4)) + sortingScore;
+    sortingScore = sort[i] * Math.pow(10, 20 - i * 4) + sortingScore;
   }
   return sortingScore;
 };
@@ -126,13 +126,12 @@ exports.getNotesByChapterId = async (req, res) => {
     if (err) {
       console.error(err);
     }
-    // console.log('Open the database connection.');
   });
   db.all(sql, [], (err, annotations) => {
     if (err) {
       return console.error(err.message);
     }
-    annotations.forEach(annotation => {
+    annotations.forEach((annotation) => {
       annotation.sorting = sorting(annotation.location);
     });
     annotations.sort((a, b) => {
